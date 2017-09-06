@@ -24,8 +24,7 @@ app.get('/newTask', function (req, res) {
     let queryData = req.query;
     console.log('queryData = ', queryData);
     res.send('push new task');
-    // task.newTask(queryData.num)
-
+    task.newTask(queryData.num)
 });
 
 

@@ -16,9 +16,13 @@ let mqConn;
  * 创建 RabbitMQ 连接
  */
 function createMqConnection() {
-    amqp.connect('amqp://localhost', function (err, conn) {
-        mqConn = conn;
-        console.log('RabbitMQ 连接已建立');
+    amqp.connect('amqp://guest:guest@172.16.10.63:5672', function (err, conn) {
+        if (err) {
+            console.log('error --> ', err);
+        } else {
+            mqConn = conn;
+            console.log('RabbitMQ 连接已建立');
+        }
     });
 }
 

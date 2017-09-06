@@ -15,7 +15,7 @@ let rabbit = require('./rabbit');
  * @param msg
  */
 function newTask(msg) {
-    mqConn.createChannel(function (err, ch) {
+    rabbit.getMqConnection().createChannel(function (err, ch) {
         let q = 'task_queue';
         ch.assertQueue(q, {durable: true}); // 防止 RabbitMQ 挂掉后 消息丢失，Publisher 和 Consumer 配置 durable 选项
         ch.sendToQueue(q, Buffer.from(msg), {persistent: true}); // 提醒 RabbitMQ 将消息保存到 disk

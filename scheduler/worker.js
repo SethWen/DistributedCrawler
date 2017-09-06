@@ -14,7 +14,7 @@ let feature = require('../feature/feature');
  * 消费普通事件
  */
 function startConsumer() {
-    amqp.connect('amqp://localhost', function (err, conn) {
+    amqp.connect('amqp://guest:guest@172.16.10.63:5672', function (err, conn) {
         conn.createChannel(function (err, ch) {
             var q = 'task_queue';
 
@@ -40,7 +40,7 @@ function startConsumer() {
  * 消费 Rpc 事件并返回结果
  */
 function startRpcConsumer() {
-    amqp.connect('amqp://localhost', function (err, conn) {
+    amqp.connect('amqp://guest:guest@172.16.10.63:5672', function (err, conn) {
         conn.createChannel(function (err, ch) {
             let q = 'rpc_queue';
 
@@ -66,5 +66,5 @@ function startRpcConsumer() {
 }
 
 
-// startConsumer();
-startRpcConsumer();
+startConsumer();
+// startRpcConsumer();
