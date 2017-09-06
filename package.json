@@ -1,0 +1,31 @@
+{
+  "name": "distributed_crawler",
+  "version": "0.8.0",
+  "description": "Crawler structure for small amount of data each time and high concurrent",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SethWen/DistributedCrawler.git"
+  },
+  "keywords": [
+    "PM2",
+    "RabbitMQ",
+    "Spider",
+    "Crawler",
+    "distributed"
+  ],
+  "author": "Shawn",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/SethWen/DistributedCrawler/issues"
+  },
+  "homepage": "https://github.com/SethWen/DistributedCrawler#readme",
+  "dependencies": {
+    "amqplib": "^0.5.1",
+    "express": "^4.15.4",
+    "request": "^2.81.0"
+  }
+}
