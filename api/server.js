@@ -35,9 +35,17 @@ app.get('/newRpcTask', function (req, res) {
     let queryData = req.query;
     console.log('queryData = ', queryData);
 
-    task.newRpcTask(queryData.num, function (result) {
+    // 在将数据传递至 RabbitMQ 层时，要考虑好传递的格式，RabbitMQ 层不要对数据进行处理，最终交给 Feature 时再处理
+    task.newRpcTask(queryData.num, generateUuid(), function (result) {
         res.send('fibonacci = ' + result);
     });
 });
 
 app.listen(3000);
+
+
+function generateUuid() {
+    return Math.random().toString() +
+        Math.random().toString() +
+        Math.random().toString();
+}

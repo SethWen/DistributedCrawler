@@ -28,36 +28,44 @@ function newTask(msg) {
 /**
  * 添加一个 Rpc 任务
  *
- * @param numString
+ * 建议不要在此处处理 Api 传入的数据，也不要处理 Worker 返回的数据。数据最好在架构的两端处理，即交给 Api
+ * 和 Feature 处理，这样可以保证 RabbitMQ 的通用性，数据只与 Api 和 Feature 两层相关
+ *
+ * @param startingData
+ * @param uuid
  * @param callback
  */
-function newRpcTask(numString, callback) {
+function newRpcTask(startingData, uuid, callback) {
     rabbit.getMqConnection().createChannel(function (err, ch) {
-        ch.assertQueue('', {exclusive: true}, function (err, q) {
-            var corr = generateUuid();
-            var num = parseInt(numString);
+        if (err) return handleError(err);
 
-            console.log(' [x] Requesting fib(%d)', num);
+        ch.assertQueue('', {exclusive: true}, function (err, q) {
+            if (err) return handleError(err);
+
+            let corr = uuid;
+            console.log('Starting data: %s', startingData.toString());
 
             ch.consume(q.queue, function (msg) {
                 if (msg.properties.correlationId === corr) {
-                    console.log(' [.] Got %s', msg.content.toString());
+                    console.log('Return data: %s', msg.content.toString());
+                    // Feature 返回的数据不要处理，交回给 Api 处理
                     callback(msg.content.toString())
                 }
             }, {noAck: true});
 
-            ch.sendToQueue(FIBONACCI_QUEUE,
-                Buffer.from(num.toString()),
-                {correlationId: corr, replyTo: q.queue});
+            ch.sendToQueue(FIBONACCI_QUEUE, Buffer.from(startingData.toString()), {correlationId: corr, replyTo: q.queue});
         });
     });
 }
 
 
-function generateUuid() {
-    return Math.random().toString() +
-        Math.random().toString() +
-        Math.random().toString();
+/***
+ * 异常处理
+ *
+ * @param err
+ */
+function handleError(err) {
+    console.log('Error ---> ', err);
 }
 
 

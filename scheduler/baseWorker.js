@@ -19,15 +19,16 @@ class BaseWorker {
      * 消费普通事件
      */
     startConsumer() {
-        amqp.connect('amqp://guest:guest@172.16.10.63:5672', function (err, conn) {
-            conn.createChannel(function (err, ch) {
-                var q = 'task_queue';
+        amqp.connect('amqp://guest:guest@172.16.10.63:5672', (err, conn) => {
+            if (err) return BaseWorker.handleError(err);
+            conn.createChannel((err, ch) => {
+                if (err) return BaseWorker.handleError(err);
 
-                ch.assertQueue(q, {durable: true});
+                ch.assertQueue(this.queueName, {durable: true});
                 ch.prefetch(1); // 该 scheduler 一次只接收一个 task，oldTask ack 后，接收新的 task
 
-                console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", q);
-                ch.consume(q, function (msg) {
+                console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", this.queueName);
+                ch.consume(this.queueName, function (msg) {
                     var secs = msg.content.toString().length;
 
                     console.log(" [x] Received %s", msg.content.toString(), '开始处理业务');
@@ -42,12 +43,30 @@ class BaseWorker {
 
 
     /**
-     * 业务处理接口，子类实现该接口即可
+     * 消费 Rpc 事件并返回结果
      *
-     * @param msg
-     * @param ch
+     * 建议不要在此处处理 Api 传入的数据，也不要处理 Worker 返回的数据。数据最好在架构的两端处理，即交给 Api
+     * 和 Feature 处理，这样可以保证 RabbitMQ 的通用性，数据只与 Api 和 Feature 两层相关
      */
-    doFeature(msg, ch) {
+    startRpcConsumer() {
+        amqp.connect('amqp://guest:guest@172.16.10.63:5672', (err, conn) => {
+            if (err) return BaseWorker.handleError(err);
+
+            conn.createChannel((err, ch) => {
+                if (err) return BaseWorker.handleError(err);
+
+                ch.assertQueue(this.queueName, {durable: false});
+                ch.prefetch(1);
+                console.log(' [x] Awaiting RPC requests');
+                ch.consume(this.queueName, (msg) => {
+                    if (msg !== null) {
+                        this.doFeature(msg, ch);
+                    } else {
+                        console.log('msg is null.');
+                    }
+                });
+            });
+        });
     }
 
 
@@ -68,22 +87,23 @@ class BaseWorker {
 
 
     /**
-     * 消费 Rpc 事件并返回结果
+     * 错误处理
+     *
+     * @param err
      */
-    startRpcConsumer() {
-        amqp.connect('amqp://guest:guest@172.16.10.63:5672', (err, conn) => {
-            conn.createChannel((err, ch) => {
-
-                ch.assertQueue(this.queueName, {durable: false});
-                ch.prefetch(1);
-                console.log(' [x] Awaiting RPC requests');
-                ch.consume(this.queueName, (msg) => {
-                    this.doFeature(msg, ch);
-                });
-            });
-        });
+    static handleError(err) {
+        console.log('Error --> ', err);
     }
 
+
+    /**
+     * 业务处理接口，子类实现该接口即可
+     *
+     * @param msg
+     * @param ch
+     */
+    doFeature(msg, ch) {
+    }
 }
 
 
