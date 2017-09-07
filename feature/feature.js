@@ -20,6 +20,22 @@ function fibonacci(n) {
 }
 
 
+/**
+ * 异步 fibonacci
+ *
+ * @param n
+ * @param callback
+ * @returns {*}
+ */
+function fibonacciAsync(n, callback) {
+    if (n === 0 || n === 1)
+        callback(n);
+    else
+        callback(fibonacci(n - 1) + fibonacci(n - 2));
+}
+
+
 module.exports = {
     fibonacci: fibonacci,
+    fibonacciAsync: fibonacciAsync,
 };

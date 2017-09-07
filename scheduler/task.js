@@ -7,6 +7,7 @@
 
 
 let rabbit = require('./rabbit');
+let {FEATURE_EXCHANGE, FIBONACCI_QUEUE, FEATURE_BINDER} = require('./mqConstant');
 
 
 /**
@@ -45,7 +46,7 @@ function newRpcTask(numString, callback) {
                 }
             }, {noAck: true});
 
-            ch.sendToQueue('rpc_queue',
+            ch.sendToQueue(FIBONACCI_QUEUE,
                 Buffer.from(num.toString()),
                 {correlationId: corr, replyTo: q.queue});
         });
