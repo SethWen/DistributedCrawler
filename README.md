@@ -6,4 +6,5 @@
 * RabbitMQ 负责任务调度；
 * Server 由 Express 编写
 
-### 使用方式
+### 项目说明
+详细的说明请转到[个人博客](http://www.jianshu.com/p/7a8e92d7927f)查看。欢迎您拍砖和 star。
